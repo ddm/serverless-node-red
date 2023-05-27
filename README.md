@@ -2,6 +2,8 @@
 
 [Node-RED](https://nodered.org/) running in a [Webcontainer](https://webcontainers.io/)
 
+![Screenshot](/screenshot.jpg | width=1024)
+
 # [Demo](https://serverless-node-red.onrender.com/index.html)
 
 https://serverless-node-red.onrender.com/index.html
