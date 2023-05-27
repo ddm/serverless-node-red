@@ -8,7 +8,7 @@ https://serverless-node-red.onrender.com/index.html
 
 # Requirements
 
-Latest Firefox (including Android) and Chromium (including Edge)
+Latest Firefox (including Android) or Chromium (including Edge)
 
 # [MIT Licens](./LICENSE)
 
