@@ -10,6 +10,6 @@ https://serverless-node-red.onrender.com/index.html
 
 Latest Firefox (including Android) or Chromium (including Edge)
 
-# [MIT Licens](./LICENSE)
+# [MIT License](./LICENSE)
 
 Copyright 2023 Dimitri del Marmol
