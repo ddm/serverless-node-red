@@ -6,6 +6,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,8 +16,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   <script type="importmap">
     {
       "imports": {
-        "@webcontainer/api": "https://unpkg.com/@webcontainer/api@1.1.3/dist/index.js",
-        "strip-ansi": "https://unpkg.com/strip-ansi@7.0.1/index.js",
+        "@webcontainer/api": "https://unpkg.com/@webcontainer/api@1.1.8/dist/index.js",
+        "@yowasp/yosys": "https://unpkg.com/@yowasp/yosys/gen/bundle-browser.js",
+        "strip-ansi": "https://unpkg.com/strip-ansi@7.1.0/index.js",
         "ansi-regex": "https://unpkg.com/ansi-regex@6.0.1/index.js"
       }
     }
@@ -42,109 +44,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </head>
 
 <body>
-  <iframe id="output" src="/loading.html"></iframe>
-  <script type="module">
-    import { WebContainer } from '@webcontainer/api'
-    import stripAnsi from 'strip-ansi'
-
-    // Singleton
-    let webcontainerInstance
-
-    const output = document.querySelector('#output')
-
-    const OutputStreamPrototype = {
-      write(data) {
-        console.log(stripAnsi(data))
-      }
-    }
-
-    const port = 1880
-  
-    const files = {
-      'index.js': {
-        file: {
-          contents: `
-            import http from 'http'
-            import express from 'express'
-            import RED from 'node-red'
-
-            const app = express()
-            app.use('/', express.static('public'))
-
-            const server = http.createServer(app)
-
-            const settings = {
-              httpAdminRoot: '/red',
-              httpNodeRoot: '/',
-              userDir: '.',
-              flowFile: 'flows.json',
-              functionGlobalContext: { }
-            }
-
-            RED.init(server, settings)
-            app.use(settings.httpAdminRoot, RED.httpAdmin)
-            app.use(settings.httpNodeRoot, RED.httpNode)
-
-            server.listen(${port})
-
-            RED.start()
-          `,
-        },
-      },
-      'package.json': {
-        file: {
-          contents: `{
-            "name": "webcontainer-bonus",
-            "type": "module",
-            "dependencies": {
-              "express": "latest",
-              "node-red": "latest",
-              "node-red-node-swagger": "latest",
-              "node-red-debugger": "latest",
-              "nodemon": "latest"
-            },
-            "scripts": {
-              "start": "nodemon index.js"
-            }
-          }`,
-        },
-      },
-      'flows.json': {
-        file: {
-          contents: `[{"id":"9e89c29fc8542ca5","type":"tab","label":"Demo","disabled":false,"info":"","env":[]},{"id":"0843d3f35176030f","type":"swagger-doc","summary":"","description":"","tags":"fun","consumes":"","produces":"application/json","parameters":[{"name":"nickname","in":"query","required":true,"type":"string"}],"responses":{"200":{"description":"OK"}},"deprecated":false},{"id":"93958d64ea603ce9","type":"http in","z":"9e89c29fc8542ca5","name":"","url":"/hello","method":"get","upload":false,"swaggerDoc":"0843d3f35176030f","x":80,"y":60,"wires":[["73682d8c5b2c36ea","091196430e602d6f"]]},{"id":"091196430e602d6f","type":"http response","z":"9e89c29fc8542ca5","name":"OK","statusCode":"","headers":{},"x":230,"y":60,"wires":[]},{"id":"73682d8c5b2c36ea","type":"debug","z":"9e89c29fc8542ca5","name":"log","active":true,"tosidebar":true,"console":false,"tostatus":true,"complete":"payload","targetType":"msg","statusVal":"payload.nickname","statusType":"msg","x":230,"y":120,"wires":[]}]`
-        }
-      },
-    }
-
-    async function initWebcontainer() {
-      // Call only once
-      webcontainerInstance = await WebContainer.boot()
-
-      await webcontainerInstance.mount(files)
-    }
-
-    async function npm(cmd) {
-      const process = await webcontainerInstance.spawn('npm', cmd)
-      const stdout = new WritableStream(OutputStreamPrototype)
-
-      // Capture output
-      process.output.pipeTo(stdout)
-
-      // Wait for process to exit
-      return process.exit
-    }
-
-    window.addEventListener('load', async () => {
-      await initWebcontainer()
-
-      webcontainerInstance.on('server-ready', (port, url) => {
-        // Ugly hack
-        setTimeout(() => { output.src = `${url}/red` }, 4000)
-      })
-
-      if (await npm(['install']) !== 0) throw new Error('Installation failed')
-      if (await npm(['run', 'start']) !== 0) throw new Error('Start failed')
-    })
-  </script>
+  <iframe id="output" src="loading.html"></iframe>
+  <script async type="module" src="main.js"></script>
 </body>
+
 </html>
