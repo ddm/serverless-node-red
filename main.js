@@ -44,11 +44,15 @@ const files = {
             runYosys: function (cmd, msg, node) {
               const result = []
               runYosys(cmd.split(' '), [], {
-                  printLine: line => result.push(line),
+                  printLine: line => {
+                    result.push(line)
+                    msg.payload = line
+                    node.send([null, msg])
+                  },
                   decodeASCII: true
               }).then(function(){
                   msg.payload = result
-                  node.send(msg)
+                  node.send([msg, null])
               })
             }
           }
